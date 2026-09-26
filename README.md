@@ -1,59 +1,30 @@
-# DevhubConsole
+# DevHub console
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.24.
+The moderator console for DevHub: the moderation queue, the audit log, account lookup and platform
+stats. It talks only to the `/admin/**`, `/auth/**` and `/users/me` endpoints of the DevHub backend
+and is served from the backend's own origin at `/console/`, so it needs no CORS.
 
-## Development server
+Sign in with a **dedicated moderator account**. DevHub keeps one session per account, so using
+your personal account here signs your phone out. See `deploy/ADMIN.md` in the backend repo for
+granting the role.
 
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Develop
 
 ```bash
-ng generate component component-name
+npm ci
+npm start            # http://localhost:4200/console/, proxies the API to localhost:8080
+npm test -- --watch=false
+npm run build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Deploy
 
-```bash
-ng generate --help
-```
+Pushing to `main` builds the image, pushes it to the `devhub-prod-console` ECR repository and
+rolls it with the `devhub-prod-deploy-console` SSM document, which can only run
+`/opt/devhub/deploy-console.sh <sha>` on the instance. Roll back by running the workflow with an
+existing `image_tag`.
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Repository variables (GitHub Environment `production`): `AWS_REGION`,
+`AWS_CONSOLE_DEPLOY_ROLE_ARN`, `CONSOLE_ECR_REPOSITORY_URL`, `INSTANCE_ID`,
+`DEPLOY_CONSOLE_DOCUMENT`, `DEVHUB_DOMAIN`. All but the domain come from `terraform output` in the
+backend repo.

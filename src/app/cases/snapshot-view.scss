@@ -1,0 +1,59 @@
+.snapshot {
+  border-left: 3px solid var(--p-content-border-color);
+  padding: 0.25rem 0 0.25rem 0.9rem;
+}
+
+.meta {
+  font-size: 0.85rem;
+  color: var(--p-text-muted-color);
+  margin-bottom: 0.5rem;
+}
+
+.body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0.25rem 0;
+}
+
+.code {
+  position: relative;
+  background: var(--p-surface-900);
+  color: var(--p-surface-50);
+  padding: 0.9rem;
+  border-radius: var(--p-border-radius-md);
+  overflow-x: auto;
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+}
+
+.lang {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin-bottom: 0.4rem;
+}
+
+.transcript {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  li {
+    padding: 0.35rem 0.6rem;
+    border-radius: var(--p-border-radius-sm);
+  }
+
+  .reported {
+    background: color-mix(in srgb, var(--p-red-500) 14%, transparent);
+    outline: 1px solid color-mix(in srgb, var(--p-red-500) 40%, transparent);
+  }
+}
+
+.sender {
+  font-weight: 600;
+  margin-right: 0.5rem;
+}

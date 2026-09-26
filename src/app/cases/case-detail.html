@@ -1,0 +1,141 @@
+<a routerLink="/cases" class="back"><i class="pi pi-arrow-left"></i> Queue</a>
+
+@if (loadError(); as error) {
+  <p-message severity="error">{{ error }}</p-message>
+}
+
+@if (detail(); as d) {
+  @let c = d.moderationCase;
+  <div class="page-header">
+    <h1>{{ humanize(c.targetType) }} report</h1>
+    <p-tag [value]="humanize(c.status)" [severity]="caseTone(c.status)" />
+  </div>
+
+  <section class="panel">
+    <dl class="facts">
+      <div>
+        <dt>Owner</dt>
+        <dd>
+          <a [routerLink]="['/users', c.ownerId]">&#64;{{ c.ownerUsername }}</a>
+        </dd>
+      </div>
+      <div>
+        <dt>Severity</dt>
+        <dd><p-tag [value]="'' + c.severity" [severity]="severityTone(c.severity)" /></dd>
+      </div>
+      <div>
+        <dt>Distinct reporters</dt>
+        <dd>{{ c.reporterCount }}</dd>
+      </div>
+      <div>
+        <dt>Auto-hidden</dt>
+        <dd>{{ c.autoHidden ? 'Yes, until a moderator acts' : 'No' }}</dd>
+      </div>
+      <div>
+        <dt>First reported</dt>
+        <dd>{{ c.firstReportedAt | date: 'medium' }}</dd>
+      </div>
+      <div>
+        <dt>Last reported</dt>
+        <dd>{{ c.lastReportedAt | date: 'medium' }}</dd>
+      </div>
+      <div>
+        <dt>Target id</dt>
+        <dd class="mono small">{{ c.targetId }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <div class="columns">
+    <section class="panel reports">
+      <h2>Reports ({{ d.reports.length }})</h2>
+      @for (report of d.reports; track report.id) {
+        <article class="report">
+          <header>
+            <p-tag [value]="humanize(report.reason)" severity="warn" />
+            <span
+              >by <strong>&#64;{{ report.reporterUsername }}</strong></span
+            >
+            <span class="muted">{{ report.createdAt | date: 'medium' }}</span>
+          </header>
+          @if (report.note) {
+            <blockquote>{{ report.note }}</blockquote>
+          }
+          <app-snapshot-view [target]="c.targetType" [raw]="report.snapshot" />
+        </article>
+      }
+    </section>
+
+    <aside class="side">
+      <section class="panel">
+        <h2>Take action</h2>
+        <form [formGroup]="form" (ngSubmit)="submit()" class="action-form">
+          <label for="action">Action</label>
+          <p-select
+            inputId="action"
+            formControlName="action"
+            [options]="options()"
+            optionLabel="label"
+            optionValue="action"
+            placeholder="Choose an action"
+            appendTo="body"
+          />
+          @if (chosenOption(); as option) {
+            <small class="muted">{{ option.description }}</small>
+          }
+
+          @if (chosen() === 'SUSPEND') {
+            <label for="days">Days</label>
+            <p-inputnumber
+              inputId="days"
+              formControlName="days"
+              [min]="1"
+              [max]="maxDays"
+              [showButtons]="true"
+            />
+          }
+
+          <label for="note">Note for the audit log</label>
+          <textarea
+            pTextarea
+            id="note"
+            formControlName="note"
+            rows="3"
+            [maxlength]="maxNote"
+          ></textarea>
+          <small class="muted counter">{{ form.controls.note.value.length }}/{{ maxNote }}</small>
+
+          @if (actionError(); as error) {
+            <p-message severity="error">{{ error }}</p-message>
+          }
+
+          <p-button type="submit" label="Apply" [loading]="acting()" [disabled]="!chosen()" />
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>History</h2>
+        @if (d.actions.length === 0) {
+          <p class="muted">No action yet.</p>
+        }
+        <ol class="history">
+          @for (action of d.actions; track $index) {
+            <li>
+              <p-tag [value]="humanize(action.action)" [severity]="actionTone(action.action)" />
+              <span>&#64;{{ action.moderatorUsername }}</span>
+              <span class="muted">{{ action.createdAt | date: 'medium' }}</span>
+              @if (action.actsUntil) {
+                <span class="muted">until {{ action.actsUntil | date: 'medium' }}</span>
+              }
+              @if (action.note) {
+                <p>{{ action.note }}</p>
+              }
+            </li>
+          }
+        </ol>
+      </section>
+    </aside>
+  </div>
+} @else if (!loadError()) {
+  <p class="muted">Loading…</p>
+}

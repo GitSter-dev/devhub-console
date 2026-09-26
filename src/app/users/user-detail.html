@@ -1,0 +1,127 @@
+<a routerLink="/users" class="back"><i class="pi pi-arrow-left"></i> Users</a>
+
+@if (error(); as error) {
+  <p-message severity="error">{{ error }}</p-message>
+}
+
+@if (detail(); as d) {
+  <div class="page-header">
+    <h1>
+      &#64;{{ d.user.username }} <span class="muted">{{ d.user.displayName }}</span>
+    </h1>
+    <div>
+      @if (d.user.role === 'ADMIN') {
+        <p-tag value="Admin" severity="contrast" />
+      }
+      <p-tag [value]="humanize(d.user.status)" [severity]="accountTone(d.user.status)" />
+    </div>
+  </div>
+
+  <section class="panel">
+    <dl class="facts">
+      <div>
+        <dt>Email</dt>
+        <dd>{{ d.user.email }}</dd>
+      </div>
+      <div>
+        <dt>Joined</dt>
+        <dd>{{ d.user.createdAt | date: 'medium' }}</dd>
+      </div>
+      <div>
+        <dt>Email verified</dt>
+        <dd>{{ d.emailVerifiedAt ? (d.emailVerifiedAt | date: 'medium') : 'Not verified' }}</dd>
+      </div>
+      @if (d.suspendedUntil) {
+        <div>
+          <dt>Suspended until</dt>
+          <dd>{{ d.suspendedUntil | date: 'medium' }}</dd>
+        </div>
+      }
+      @if (d.bannedAt) {
+        <div>
+          <dt>Banned</dt>
+          <dd>{{ d.bannedAt | date: 'medium' }}</dd>
+        </div>
+      }
+      @if (d.deactivatedAt) {
+        <div>
+          <dt>Deactivated</dt>
+          <dd>{{ d.deactivatedAt | date: 'medium' }}</dd>
+        </div>
+      }
+      @if (d.deletedAt) {
+        <div>
+          <dt>Deleted</dt>
+          <dd>{{ d.deletedAt | date: 'medium' }}</dd>
+        </div>
+      }
+      <div>
+        <dt>Posts</dt>
+        <dd>{{ d.postCount }}</dd>
+      </div>
+      <div>
+        <dt>Reports filed</dt>
+        <dd>{{ d.reportsFiled }}</dd>
+      </div>
+      <div>
+        <dt>Reports against</dt>
+        <dd>{{ d.reportsAgainst }}</dd>
+      </div>
+      <div>
+        <dt>Id</dt>
+        <dd class="mono">{{ d.user.id }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="panel">
+    <h2>Cases about their content</h2>
+    <p-table [value]="d.cases" dataKey="id">
+      <ng-template #header>
+        <tr>
+          <th>Target</th>
+          <th>Status</th>
+          <th>Severity</th>
+          <th>Reporters</th>
+          <th>Last reported</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-item>
+        <tr
+          class="clickable-row"
+          (click)="openCase(item)"
+          tabindex="0"
+          (keydown.enter)="openCase(item)"
+        >
+          <td>{{ humanize(item.targetType) }}</td>
+          <td><p-tag [value]="humanize(item.status)" [severity]="caseTone(item.status)" /></td>
+          <td>{{ item.severity }}</td>
+          <td>{{ item.reporterCount }}</td>
+          <td>{{ item.lastReportedAt | date: 'medium' }}</td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="5" class="muted">Nobody has reported their content.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </section>
+
+  <section class="panel">
+    <h2>Actions taken against them</h2>
+    <app-audit-table [entries]="history.items()" [loading]="history.loading()" />
+    @if (history.nextCursor()) {
+      <div class="load-more">
+        <p-button
+          label="Load more"
+          [text]="true"
+          [loading]="history.loading()"
+          (onClick)="history.more()"
+        />
+      </div>
+    }
+  </section>
+} @else if (!error()) {
+  <p class="muted">Loading…</p>
+}

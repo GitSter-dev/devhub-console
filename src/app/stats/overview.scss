@@ -1,0 +1,41 @@
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 1rem;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0;
+
+  &.alert .value {
+    color: var(--p-amber-500);
+  }
+}
+
+.label {
+  font-size: 0.85rem;
+  color: var(--p-text-muted-color);
+}
+
+.value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+section {
+  margin-top: 1.25rem;
+}
+
+h2 .muted {
+  font-weight: 400;
+  font-size: 0.85rem;
+  margin-left: 0.5rem;
+}
+
+.chart {
+  height: 22rem;
+}

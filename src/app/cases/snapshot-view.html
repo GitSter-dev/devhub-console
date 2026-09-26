@@ -1,0 +1,69 @@
+@let s = snapshot();
+<div class="snapshot">
+  @switch (s.kind) {
+    @case ('POST') {
+      <div class="meta">
+        Post by <strong>&#64;{{ s.author }}</strong>
+        @if (s.createdAt) {
+          · {{ s.createdAt | date: 'medium' }}
+        }
+      </div>
+      @if (s.body) {
+        <p class="body">{{ s.body }}</p>
+      }
+      @if (s.code) {
+        <pre
+          class="code mono"
+        ><span class="lang">{{ s.codeLanguage || 'code' }}</span>{{ s.code }}</pre>
+      }
+    }
+    @case ('MESSAGE') {
+      <div class="meta">
+        Message from <strong>&#64;{{ s.sender }}</strong>
+        @if (s.createdAt) {
+          · {{ s.createdAt | date: 'medium' }}
+        }
+        · the reported message is last
+      </div>
+      <ol class="transcript">
+        @for (line of s.lines; track $index; let last = $last) {
+          <li [class.reported]="last">
+            <span class="sender">&#64;{{ line.sender || 'system' }}</span>
+            @if (line.body) {
+              <span class="body">{{ line.body }}</span>
+            }
+            @if (line.code) {
+              <pre class="code mono">{{ line.code }}</pre>
+            }
+          </li>
+        }
+      </ol>
+    }
+    @case ('USER') {
+      <dl class="facts">
+        <div>
+          <dt>Username</dt>
+          <dd>&#64;{{ s.username }}</dd>
+        </div>
+        <div>
+          <dt>Display name</dt>
+          <dd>{{ s.displayName }}</dd>
+        </div>
+        <div>
+          <dt>GitHub</dt>
+          <dd>{{ s.githubUsername || '—' }}</dd>
+        </div>
+        <div>
+          <dt>Website</dt>
+          <dd>{{ s.websiteUrl || '—' }}</dd>
+        </div>
+      </dl>
+      @if (s.bio) {
+        <p class="body">{{ s.bio }}</p>
+      }
+    }
+    @case ('RAW') {
+      <pre class="code mono">{{ s.text }}</pre>
+    }
+  }
+</div>

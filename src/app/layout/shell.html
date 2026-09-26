@@ -1,0 +1,36 @@
+<div class="shell">
+  <aside class="nav">
+    <div class="brand"><i class="pi pi-shield"></i> DevHub console</div>
+    <nav>
+      @for (link of links; track link.path) {
+        <a [routerLink]="link.path" routerLinkActive="active">
+          <i [class]="link.icon"></i>
+          <span>{{ link.label }}</span>
+        </a>
+      }
+    </nav>
+    <div class="account">
+      <span class="who">&#64;{{ session.user()?.username }}</span>
+      <div class="account-actions">
+        <p-button
+          [icon]="theme.dark() ? 'pi pi-sun' : 'pi pi-moon'"
+          [text]="true"
+          [rounded]="true"
+          severity="secondary"
+          [ariaLabel]="theme.dark() ? 'Use light theme' : 'Use dark theme'"
+          (onClick)="theme.toggle()"
+        />
+        <p-button
+          label="Sign out"
+          icon="pi pi-sign-out"
+          [text]="true"
+          severity="secondary"
+          (onClick)="session.logout()"
+        />
+      </div>
+    </div>
+  </aside>
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>

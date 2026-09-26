@@ -1,0 +1,72 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Existing image tag to roll back to. Leave blank to build HEAD."
+        required: false
+
+concurrency:
+  group: deploy-console-prod
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test:
+    if: inputs.image_tag == ''
+    uses: ./.github/workflows/test.yml
+
+  deploy:
+    needs: [test]
+    if: always() && (needs.test.result == 'success' || inputs.image_tag != '')
+    runs-on: ubuntu-24.04
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: tag
+        run: echo "tag=${{ inputs.image_tag || github.sha }}" >> "$GITHUB_OUTPUT"
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_CONSOLE_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - uses: aws-actions/amazon-ecr-login@v2
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build and push image
+        if: inputs.image_tag == ''
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ vars.CONSOLE_ECR_REPOSITORY_URL }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
+
+      - name: Roll the console
+        env:
+          IMAGE_TAG: ${{ steps.tag.outputs.tag }}
+          INSTANCE_ID: ${{ vars.INSTANCE_ID }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          DOCUMENT: ${{ vars.DEPLOY_CONSOLE_DOCUMENT }}
+        run: .github/scripts/deploy.sh
+
+      - name: Verify the public console
+        run: |
+          code=$(curl -sS --max-time 10 --retry 6 --retry-delay 5 \
+            -o /dev/null -w '%{http_code}' "https://${{ vars.DEVHUB_DOMAIN }}/console/")
+          echo "GET /console/ -> $code"
+          if [ "$code" != "200" ]; then
+            echo "::error::console answered $code"
+            exit 1
+          fi

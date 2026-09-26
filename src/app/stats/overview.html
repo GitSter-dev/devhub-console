@@ -1,0 +1,39 @@
+<div class="page-header">
+  <h1>Stats</h1>
+  <p-selectbutton
+    [options]="ranges"
+    optionLabel="label"
+    optionValue="value"
+    [allowEmpty]="false"
+    [ngModel]="days()"
+    (ngModelChange)="days.set($event)"
+  />
+</div>
+
+@if (error(); as error) {
+  <p-message severity="error">{{ error }}</p-message>
+}
+
+<div class="tiles">
+  @for (tile of tiles(); track tile.label) {
+    <div class="panel tile" [class.alert]="tile.alert">
+      <span class="label">{{ tile.label }}</span>
+      <span class="value">{{ tile.value }}</span>
+    </div>
+  }
+</div>
+
+@if (overview(); as o) {
+  <section class="panel">
+    <h2>
+      Daily activity
+      <span class="muted"
+        >{{ o.daily[0]?.date | date: 'mediumDate' }} –
+        {{ o.daily[o.daily.length - 1]?.date | date: 'mediumDate' }}, UTC</span
+      >
+    </h2>
+    <div class="chart">
+      <p-chart type="line" [data]="chartData()" [options]="chartOptions()" height="100%" />
+    </div>
+  </section>
+}

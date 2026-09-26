@@ -1,0 +1,72 @@
+<div class="page-header">
+  <h1>Moderation queue</h1>
+  <p-selectbutton
+    [options]="statusOptions"
+    optionLabel="label"
+    optionValue="value"
+    [allowEmpty]="false"
+    [ngModel]="current()"
+    (ngModelChange)="choose($event)"
+  />
+</div>
+
+@if (pager.error(); as error) {
+  <p-message severity="error">{{ error }}</p-message>
+}
+
+<div class="panel">
+  <p-table
+    [value]="pager.items()"
+    [loading]="pager.loading() && pager.items().length === 0"
+    dataKey="id"
+  >
+    <ng-template #header>
+      <tr>
+        <th>Target</th>
+        <th>Owner</th>
+        <th>Severity</th>
+        <th>Reporters</th>
+        <th>Auto-hidden</th>
+        <th>Last reported</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-item>
+      <tr class="clickable-row" (click)="open(item)" tabindex="0" (keydown.enter)="open(item)">
+        <td><p-tag [value]="humanize(item.targetType)" severity="secondary" /></td>
+        <td>
+          <a [routerLink]="['/users', item.ownerId]" (click)="$event.stopPropagation()"
+            >&#64;{{ item.ownerUsername }}</a
+          >
+        </td>
+        <td><p-tag [value]="'' + item.severity" [severity]="severityTone(item.severity)" /></td>
+        <td>{{ item.reporterCount }}</td>
+        <td>
+          @if (item.autoHidden) {
+            <i class="pi pi-eye-slash" title="Hidden until a moderator looks"></i>
+          }
+        </td>
+        <td>{{ item.lastReportedAt | date: 'medium' }}</td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="6" class="muted">
+          @if (!pager.loading()) {
+            Nothing {{ humanize(current()).toLowerCase() }} here.
+          }
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  @if (pager.nextCursor()) {
+    <div class="load-more">
+      <p-button
+        label="Load more"
+        [text]="true"
+        [loading]="pager.loading()"
+        (onClick)="pager.more()"
+      />
+    </div>
+  }
+</div>

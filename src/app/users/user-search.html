@@ -1,0 +1,56 @@
+<div class="page-header">
+  <h1>Users</h1>
+</div>
+
+<div class="panel">
+  <p-iconfield>
+    <p-inputicon [styleClass]="searching() ? 'pi pi-spinner pi-spin' : 'pi pi-search'" />
+    <input
+      pInputText
+      type="search"
+      [formControl]="query"
+      placeholder="Email, username or display name"
+      aria-label="Search accounts"
+      autofocus
+      [style.width]="'min(32rem, 100%)'"
+    />
+  </p-iconfield>
+  <p class="muted">Includes banned, suspended, deactivated and unverified accounts.</p>
+
+  @if (error(); as error) {
+    <p-message severity="error">{{ error }}</p-message>
+  }
+
+  @if (searched()) {
+    <p-table [value]="results()" dataKey="id">
+      <ng-template #header>
+        <tr>
+          <th>Username</th>
+          <th>Display name</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Joined</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-user>
+        <tr class="clickable-row" (click)="open(user)" tabindex="0" (keydown.enter)="open(user)">
+          <td>
+            &#64;{{ user.username }}
+            @if (user.role === 'ADMIN') {
+              <p-tag value="Admin" severity="contrast" />
+            }
+          </td>
+          <td>{{ user.displayName }}</td>
+          <td>{{ user.email }}</td>
+          <td><p-tag [value]="humanize(user.status)" [severity]="tone(user.status)" /></td>
+          <td>{{ user.createdAt | date: 'mediumDate' }}</td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="5" class="muted">No account matches.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>
