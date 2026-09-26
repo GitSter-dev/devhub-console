@@ -11,7 +11,7 @@ how the platform is doing.
 
 Part of DevHub: [Mobile app](https://github.com/GitSter-dev/devhub-app) · [Backend](https://github.com/GitSter-dev/devhub-backend) · **Moderator console**
 
-![The moderation queue](docs/screenshots/queue.png)
+![Reviewing a reported post in the moderation console](docs/screenshots/case.jpg)
 
 ## What it does
 
