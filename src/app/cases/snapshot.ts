@@ -6,6 +6,7 @@ export interface PostSnapshot {
   body: string;
   code: string;
   codeLanguage: string;
+  community: string;
   createdAt: string;
 }
 
@@ -32,12 +33,24 @@ export interface UserSnapshot {
   websiteUrl: string;
 }
 
+export interface CommunitySnapshot {
+  kind: 'COMMUNITY';
+  slug: string;
+  name: string;
+  description: string;
+}
+
 export interface RawSnapshot {
   kind: 'RAW';
   text: string;
 }
 
-export type Snapshot = PostSnapshot | MessageSnapshot | UserSnapshot | RawSnapshot;
+export type Snapshot =
+  | PostSnapshot
+  | MessageSnapshot
+  | UserSnapshot
+  | CommunitySnapshot
+  | RawSnapshot;
 
 export function parseSnapshot(target: ReportTarget, raw: string): Snapshot {
   let value: Record<string, unknown>;
@@ -55,6 +68,7 @@ export function parseSnapshot(target: ReportTarget, raw: string): Snapshot {
         body: text('body'),
         code: text('code'),
         codeLanguage: text('codeLanguage'),
+        community: text('community'),
         createdAt: text('createdAt'),
       };
     case 'MESSAGE':
@@ -72,6 +86,13 @@ export function parseSnapshot(target: ReportTarget, raw: string): Snapshot {
         bio: text('bio'),
         githubUsername: text('githubUsername'),
         websiteUrl: text('websiteUrl'),
+      };
+    case 'COMMUNITY':
+      return {
+        kind: 'COMMUNITY',
+        slug: text('slug'),
+        name: text('name'),
+        description: text('description'),
       };
   }
 }

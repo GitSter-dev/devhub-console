@@ -4,6 +4,9 @@
     @case ('POST') {
       <div class="meta">
         Post by <strong>&#64;{{ s.author }}</strong>
+        @if (s.community) {
+          in <strong>c/{{ s.community }}</strong>
+        }
         @if (s.createdAt) {
           · {{ s.createdAt | date: 'medium' }}
         }
@@ -60,6 +63,21 @@
       </dl>
       @if (s.bio) {
         <p class="body">{{ s.bio }}</p>
+      }
+    }
+    @case ('COMMUNITY') {
+      <dl class="facts">
+        <div>
+          <dt>Name</dt>
+          <dd>{{ s.name }}</dd>
+        </div>
+        <div>
+          <dt>Slug</dt>
+          <dd>c/{{ s.slug }}</dd>
+        </div>
+      </dl>
+      @if (s.description) {
+        <p class="body">{{ s.description }}</p>
       }
     }
     @case ('RAW') {
