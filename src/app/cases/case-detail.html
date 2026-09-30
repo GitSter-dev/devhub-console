@@ -19,6 +19,17 @@
           <a [routerLink]="['/users', c.ownerId]">&#64;{{ c.ownerUsername }}</a>
         </dd>
       </div>
+      @if (c.community; as community) {
+        <div>
+          <dt>Community</dt>
+          <dd>
+            <a [routerLink]="['/cases']" [queryParams]="{ community: community.id }"
+              >{{ community.name }}</a
+            >
+            <span class="muted"> c/{{ community.slug }}</span>
+          </dd>
+        </div>
+      }
       <div>
         <dt>Severity</dt>
         <dd><p-tag [value]="'' + c.severity" [severity]="severityTone(c.severity)" /></dd>

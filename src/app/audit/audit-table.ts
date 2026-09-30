@@ -17,6 +17,7 @@ import { actionTone, humanize } from '../shared/labels';
           <th>Action</th>
           <th>Moderator</th>
           <th>Against</th>
+          <th>Community</th>
           <th>Until</th>
           <th>Note</th>
           <th>Case</th>
@@ -32,6 +33,13 @@ import { actionTone, humanize } from '../shared/labels';
               <a [routerLink]="['/users', entry.targetUserId]">&#64;{{ entry.targetUsername }}</a>
             }
           </td>
+          <td>
+            @if (entry.community; as community) {
+              <a [routerLink]="['/cases']" [queryParams]="{ community: community.id }"
+                >c/{{ community.slug }}</a
+              >
+            }
+          </td>
           <td>{{ entry.actsUntil ? (entry.actsUntil | date: 'medium') : '' }}</td>
           <td class="note">{{ entry.note }}</td>
           <td>
@@ -45,7 +53,7 @@ import { actionTone, humanize } from '../shared/labels';
       </ng-template>
       <ng-template #emptymessage>
         <tr>
-          <td colspan="7" class="muted">{{ loading() ? '' : 'No moderation actions yet.' }}</td>
+          <td colspan="8" class="muted">{{ loading() ? '' : 'No moderation actions yet.' }}</td>
         </tr>
       </ng-template>
     </p-table>
