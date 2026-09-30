@@ -49,8 +49,29 @@ const OPTIONS: ActionOption[] = [
 
 const CONTENT_ONLY = new Set<ModerationActionType>(['REMOVE_CONTENT', 'RESTORE']);
 
+const COMMUNITY_WORDING: Partial<Record<ModerationActionType, Omit<ActionOption, 'action'>>> = {
+  REMOVE_CONTENT: {
+    label: 'Take down community',
+    description: 'Hides the community and its posts from everyone and tells the reporters.',
+  },
+  RESTORE: {
+    label: 'Restore community',
+    description: 'Brings a taken-down community back and closes the case as dismissed.',
+  },
+  WARN: {
+    label: 'Warn owner',
+    description: 'Closes the case as actioned. The owner is not notified.',
+  },
+};
+
 export function availableActions(target: ReportTarget): ActionOption[] {
-  return target === 'USER' ? OPTIONS.filter((option) => !CONTENT_ONLY.has(option.action)) : OPTIONS;
+  if (target === 'USER') {
+    return OPTIONS.filter((option) => !CONTENT_ONLY.has(option.action));
+  }
+  if (target === 'COMMUNITY') {
+    return OPTIONS.map((option) => ({ ...option, ...COMMUNITY_WORDING[option.action] }));
+  }
+  return OPTIONS;
 }
 
 export function actionProblem(
