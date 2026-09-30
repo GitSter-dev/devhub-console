@@ -12,6 +12,17 @@ describe('case actions', () => {
     expect(forPost).toContain('RESTORE');
   });
 
+  it('words content actions as taking down a reported community', () => {
+    const forCommunity = availableActions('COMMUNITY');
+    const takeDown = forCommunity.find((option) => option.action === 'REMOVE_CONTENT');
+
+    expect(takeDown?.label).toBe('Take down community');
+    expect(forCommunity.map((option) => option.action)).toContain('RESTORE');
+    expect(availableActions('POST').find((option) => option.action === 'REMOVE_CONTENT')?.label).toBe(
+      'Remove content',
+    );
+  });
+
   it('requires a suspension length between 1 and 365 days', () => {
     expect(actionProblem('SUSPEND', null)).toBeTruthy();
     expect(actionProblem('SUSPEND', 0)).toBeTruthy();
