@@ -2,11 +2,19 @@ export type Role = 'USER' | 'ADMIN';
 export type AccountStatus =
   'ACTIVE' | 'UNVERIFIED' | 'SUSPENDED' | 'BANNED' | 'DEACTIVATED' | 'DELETED';
 export type CaseStatus = 'OPEN' | 'ACTIONED' | 'DISMISSED';
-export type ReportTarget = 'POST' | 'MESSAGE' | 'USER';
+export type ReportTarget = 'POST' | 'MESSAGE' | 'USER' | 'COMMUNITY';
 export type ReportReason =
   'SPAM' | 'IMPERSONATION' | 'HARASSMENT' | 'HATE' | 'SEXUAL' | 'VIOLENCE' | 'SELF_HARM' | 'OTHER';
 export type ModerationActionType =
-  'DISMISS' | 'REMOVE_CONTENT' | 'WARN' | 'SUSPEND' | 'BAN' | 'RESTORE' | 'REINSTATE';
+  | 'DISMISS'
+  | 'REMOVE_CONTENT'
+  | 'WARN'
+  | 'SUSPEND'
+  | 'BAN'
+  | 'RESTORE'
+  | 'REINSTATE'
+  | 'COMMUNITY_BAN'
+  | 'COMMUNITY_UNBAN';
 
 export interface TokenPair {
   tokenType: string;
@@ -24,6 +32,19 @@ export interface CurrentUser {
   role: Role;
 }
 
+export interface CaseCommunity {
+  id: string;
+  slug: string;
+  name: string;
+}
+
+export interface CommunitySummary {
+  id: string;
+  slug: string;
+  name: string;
+  memberCount: number;
+}
+
 export interface CaseView {
   id: string;
   targetType: ReportTarget;
@@ -36,6 +57,7 @@ export interface CaseView {
   autoHidden: boolean;
   firstReportedAt: string;
   lastReportedAt: string;
+  community: CaseCommunity | null;
 }
 
 export interface CasePage {
@@ -82,6 +104,7 @@ export interface AuditEntry {
   note: string | null;
   actsUntil: string | null;
   createdAt: string;
+  community: CaseCommunity | null;
 }
 
 export interface AuditPage {
