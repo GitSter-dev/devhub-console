@@ -96,7 +96,7 @@ export class CaseDetailComponent {
     }
     const option = this.chosenOption();
     this.confirmation.confirm({
-      header: `${option?.label ?? humanize(action)} this case?`,
+      header: `${option?.label ?? humanize(action)}?`,
       message: `${option?.description ?? ''} This is written to the audit log.`,
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: option?.label ?? 'Confirm',
