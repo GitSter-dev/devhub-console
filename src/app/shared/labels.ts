@@ -30,6 +30,8 @@ const ACTION_SEVERITY: Record<ModerationActionType, TagSeverity> = {
   BAN: 'danger',
   RESTORE: 'info',
   REINSTATE: 'info',
+  COMMUNITY_BAN: 'warn',
+  COMMUNITY_UNBAN: 'info',
 };
 
 export function severityTone(severity: number): TagSeverity {
