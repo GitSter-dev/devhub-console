@@ -8,9 +8,11 @@ import { AuditPage, CaseDetail, CasePage, CaseStatus, ModerationActionRequest } 
 export class ModerationApi {
   private readonly http = inject(HttpClient);
 
-  cases(status: CaseStatus, cursor: string | null) {
+  cases(status: CaseStatus, communityId: string | null, cursor: string | null) {
     return this.http
-      .get<ApiEnvelope<CasePage>>('/admin/moderation/cases', { params: query({ status, cursor }) })
+      .get<ApiEnvelope<CasePage>>('/admin/moderation/cases', {
+        params: query({ status, communityId, cursor }),
+      })
       .pipe(unwrap());
   }
 

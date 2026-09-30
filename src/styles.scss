@@ -54,6 +54,17 @@ a {
   }
 }
 
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.filters {
+  margin-bottom: 1rem;
+}
+
 .panel {
   background: var(--p-content-background);
   border: 1px solid var(--p-content-border-color);

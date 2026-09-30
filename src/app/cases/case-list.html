@@ -1,14 +1,38 @@
 <div class="page-header">
   <h1>Moderation queue</h1>
-  <p-selectbutton
-    [options]="statusOptions"
-    optionLabel="label"
-    optionValue="value"
-    [allowEmpty]="false"
-    [ngModel]="current()"
-    (ngModelChange)="choose($event)"
-  />
+  <div class="controls">
+    <p-autocomplete
+      [ngModel]="null"
+      [suggestions]="suggestions()"
+      (completeMethod)="searchCommunities($event)"
+      (onSelect)="filterBy($event.value)"
+      optionLabel="name"
+      placeholder="Filter by community"
+      [minQueryLength]="2"
+      [delay]="300"
+      ariaLabel="Filter by community"
+    />
+    <p-selectbutton
+      [options]="statusOptions"
+      optionLabel="label"
+      optionValue="value"
+      [allowEmpty]="false"
+      [ngModel]="current()"
+      (ngModelChange)="choose($event)"
+    />
+  </div>
 </div>
+
+@if (communityId()) {
+  <div class="filters">
+    <p-chip
+      [label]="'Community: ' + communityLabel()"
+      icon="pi pi-users"
+      [removable]="true"
+      (onRemove)="clearCommunity()"
+    />
+  </div>
+}
 
 @if (pager.error(); as error) {
   <p-message severity="error">{{ error }}</p-message>
@@ -23,6 +47,7 @@
     <ng-template #header>
       <tr>
         <th>Target</th>
+        <th>Community</th>
         <th>Owner</th>
         <th>Severity</th>
         <th>Reporters</th>
@@ -33,6 +58,18 @@
     <ng-template #body let-item>
       <tr class="clickable-row" (click)="open(item)" tabindex="0" (keydown.enter)="open(item)">
         <td><p-tag [value]="humanize(item.targetType)" severity="secondary" /></td>
+        <td>
+          @if (item.community; as community) {
+            <a
+              [routerLink]="[]"
+              [queryParams]="{ community: community.id }"
+              queryParamsHandling="merge"
+              [title]="'Only cases in ' + community.name"
+              (click)="$event.stopPropagation()"
+              >c/{{ community.slug }}</a
+            >
+          }
+        </td>
         <td>
           <a [routerLink]="['/users', item.ownerId]" (click)="$event.stopPropagation()"
             >&#64;{{ item.ownerUsername }}</a
@@ -50,7 +87,7 @@
     </ng-template>
     <ng-template #emptymessage>
       <tr>
-        <td colspan="6" class="muted">
+        <td colspan="7" class="muted">
           @if (!pager.loading()) {
             Nothing {{ humanize(current()).toLowerCase() }} here.
           }
